@@ -24,7 +24,7 @@ jobs:
         id: docker_meta
         uses: crazy-max/ghaction-docker-meta@v1
         with:
-          images: anyfavors/k8sdiadoc # list of Docker images to use as base name for tags
+          images: ghcr.io/anyfavors/k8sdiadoc # list of Docker images to use as base name for tags
           tag-sha: true # add git short SHA as Docker tag
         
       - name: Set up QEMU
