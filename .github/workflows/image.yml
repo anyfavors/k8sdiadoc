@@ -36,3 +36,31 @@ jobs:
         
       - name: Available platforms
         run: echo ${{ steps.buildx.outputs.platforms }}
+    
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+      
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1 
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.CR_PAT }}
+        
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64,linux/ppc64le,linux/s390x
+          push: true
+          tags: |
+            anyfavors/k8sdiadoc:latest
+            anyfavors/k8sdiadoc:1.0.0
+            ghcr.io/anyfavors/k8sdiadoc:latest
+            ghcr.io/anyfavors/k8sdiadoc:1.0.0  
