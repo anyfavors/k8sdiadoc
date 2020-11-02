@@ -20,6 +20,13 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
         
+      - name: Docker meta
+        id: docker_meta
+        uses: crazy-max/ghaction-docker-meta@v1
+        with:
+          images: anyfavors/k8sdiadoc # list of Docker images to use as base name for tags
+          tag-sha: true # add git short SHA as Docker tag
+        
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
         with:
@@ -46,8 +53,9 @@ jobs:
             ${{ runner.os }}-buildx-
             
                      
-      - name: Login to GitHub Container Registry
-        run: echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
+      - name: docker login
+        run: |
+          echo "${{ secrets.CR_PAT }}" | docker login https://ghcr.io -u ${{ github.actor }} --password-stdin
  
         
       - name: Build and push
@@ -57,8 +65,5 @@ jobs:
           file: ./Dockerfile
           platforms: linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64,linux/ppc64le,linux/s390x
           push: true
-          tags: |
-            anyfavors/k8sdiadoc:latest
-            anyfavors/k8sdiadoc:1.0.0
-            ghcr.io/anyfavors/k8sdiadoc:latest
-            ghcr.io/anyfavors/k8sdiadoc:1.0.0  
+          tags: ${{ steps.docker_meta.outputs.tags }}
+          labels: ${{ steps.docker_meta.outputs.labels }}
