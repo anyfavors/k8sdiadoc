@@ -17,5 +17,5 @@ COPY icons /icons
 
 COPY k8sviz.sh /
 
-CMD /k8sviz.sh
+CMD /k8sviz.sh && chmod +x /k8sviz.sh
 
